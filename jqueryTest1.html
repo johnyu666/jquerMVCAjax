@@ -1,0 +1,137 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+    <style>
+        .hi{
+            background-color: yellow;
+            color: red;
+        }
+        #updatePan{
+            width: 300px;
+            height: 300px;
+            background-color: yellow;
+            position: absolute;
+            top: 100px;
+            left: 300px;
+            display: none;
+            opacity: 0.8;
+        }
+    </style>
+
+
+    <script src="js/jquery.js"></script>
+
+</head>
+<body>
+<h1>无模式下实现CURD</h1>
+<button>获取全部数据</button>
+
+<form id="add" action="#">
+    <input type="text" name="bname"><br>
+    <input type="number" name="price"><br>
+    <input type="submit">
+</form>
+<table id="books1"></table>
+
+
+<div id="updatePan">
+    <form name="update">
+        <input type="text" name="bname"><br>
+        <input type="number" name="price"><br>
+        <input type="submit">
+    </form>
+</div>
+<script>
+
+    var books=null;
+    function createTable() {
+        var table=$("#books1");
+        table.empty();
+        books.forEach((book,index)=>{
+            var tr=$("<tr>")
+                .data("book",book)
+                .append($("<td>").text(book.id))
+                .append($("<td>").text(book.bname))
+                .append($("<td>").text(book.price))
+                .append($("<td>").append($("<button>").addClass("del").text("删除")))
+                .appendTo(table);
+
+        });
+        bindDel();
+        bindUpdate();
+    };
+    function bindDel() {
+        $("#books1 .del").on("click",function () {
+            var b=$(this).parents("tr").data("book");
+            delBook(b);
+        })
+    }
+    function bindUpdate() {
+        $("#books1 tr").dblclick(function(){
+            $("#updatePan").css({"display":"block"});
+            var book=$(this).data("book");
+            $("#updatePan from").data("book",book);
+
+            $("#updatePan input[name=bname]").val(book.bname);
+            $("#updatePan input[name=price]").val(book.price);
+
+            $("#updatePan form").off("submit");
+            $("#updatePan form").on("submit",function (event) {
+                var bootTemp={bname:$("#updatePan input[name=bname]").val(),
+                price:$("#updatePan input[name=price]").val()};
+                var option={type:"PUT",url:"http://localhost:8080/books/"+book.id};
+                option.contentType="application/json";
+                option.data=JSON.stringify(bootTemp);
+                $.ajax(option)
+                    .done(function (bk) {
+                        book.bname=bk.bname;
+                        book.price=bk.price;
+                        createTable();
+                        $("#updatePan").css({"display":"none"});
+                    });
+
+
+                event.preventDefault();
+            });
+        })
+
+    }
+    function delBook(book) {
+        $.ajax({type:"DELETE",url:"http://localhost:8080/books/"+book.id})
+            .done(function () {
+                var index=books.indexOf(book);
+                books.splice(index,1);
+                createTable();
+            });
+    }
+
+    function addBook(book) {
+        books.push(book);
+        createTable();
+    }
+
+    $("button:first").on("click",function () {
+        var opt={type:"GET",url:"http://localhost:8080/books"};
+       $.ajax(opt)
+           .done(function (bks) {
+               books=bks;
+               createTable();
+           });
+    });
+
+    $("#add").on("submit",function (event) {
+        var b={bname:$("#add input[name=bname]").val(),price:$("#add input[name=price]").val()};
+        $.ajax({type:"POST",url:"http://localhost:8080/books",data:JSON.stringify(b),contentType:"application/json"})
+            .done(function (book) {
+                addBook(book);
+            });
+        event.preventDefault();
+    });
+
+
+
+</script>
+</body>
+</html>

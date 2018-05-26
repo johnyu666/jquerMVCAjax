@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+</head>
+<body>
+
+    <h1>原生JS完成CURD操作</h1>
+    <button id="create">create table</button>
+    <div id="books">
+
+    </div>
+<script>
+    //from server
+    var books=[
+        {id:1,bname:'harry polt',price:123.87},
+        {id:2,bname:'my world',price:98.12},
+        {id:3,bname:'Thinking in java',price:198.12}
+    ];
+    var btn=document.getElementById("create");
+    btn.onclick=function () {
+        createTable();
+
+    };
+
+    function createTable() {
+        document.getElementById("books").innerHTML="";
+        var table=document.createElement("table");
+        books.forEach((book,index)=>{
+            var tr=document.createElement("tr");
+            var td1=document.createElement("td");
+            td1.textContent=book.id;
+            var td2=document.createElement("td");
+            td2.textContent=book.bname;
+            var td3=document.createElement("td");
+            td3.textContent=book.price;
+            var td4=document.createElement("td");
+            var delBtn=document.createElement("button");
+            delBtn.index=index;
+            delBtn.innerHTML="删除";
+            delBtn.onclick=function () {
+               let  inx=delBtn.index;
+                books.splice(inx,1);
+                createTable();
+            };
+
+            td4.appendChild(delBtn);
+
+
+            tr.appendChild(td1);
+            tr.appendChild(td2);
+            tr.appendChild(td3);
+            tr.appendChild(td4);
+            table.appendChild(tr);
+        });
+        document.getElementById("books").appendChild(table);
+    }
+
+</script>
+</body>
+</html>

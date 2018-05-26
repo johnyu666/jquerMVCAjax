@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+    <script src="js/jquery.js"></script>
+    <link rel="stylesheet" href="css/main1.css">
+    <script src="js_lib/bookManager.js"></script>
+    <script src="js_lib/bookRender.js"></script>
+
+</head>
+<body>
+
+<h1>MVC模式下实现CURD</h1>
+<h2>使用模拟数据，加模拟回调方式</h2>
+<h2>代码进行了分离</h2>
+
+<button id="findAllBooksBtn">
+    find All Books
+</button>
+<button id="test">test</button>
+<div id="wraper">
+    <div id="bookAdd">
+        <form>
+            <input type="text" name="bname">
+            <input type="number" name="price">
+            <input type="submit">
+        </form>
+    </div>
+    <div id="bookList">
+        <table>
+            <thead>
+            <tr>
+                <th>id</th>
+                <th>bname</th>
+                <th>price</th>
+                <th>删除</th>
+            </tr>
+            </thead>
+            <tbody></tbody>
+        </table>
+    </div>
+    <div id="updateBook">
+        <form>
+            <input type="text" name="bname">
+            <input type="decimal" name="price">
+            <input type="submit">
+        </form>
+    </div>
+</div>
+<script>
+
+
+    $(function () {
+
+
+        var bookManager = new BookManager("");
+        var render = new BookRender(bookManager, $("#bookList table"));
+        $("#bookAdd form").on("submit",(event)=>{
+           render.addRow();
+            event.preventDefault();
+        });
+
+    });
+</script>
+
+</body>
+</html>

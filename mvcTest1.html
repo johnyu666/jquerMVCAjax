@@ -1,0 +1,198 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+    <script src="js/jquery.js"></script>
+    <link rel="stylesheet" href="css/main1.css">
+    <script src="js_lib/bookManager.js"></script>
+
+</head>
+<body>
+<h1>MVC模式下实现CURD</h1>
+<h2>使用模拟数据，加模拟回调方式</h2>
+<h2>代码未分离</h2>
+<button id="findAllBooksBtn">
+    find All Books
+</button>
+<button id="test">test</button>
+<div id="wraper">
+    <div id="bookAdd">
+        <form>
+            <input type="text" name="bname">
+            <input type="number" name="price">
+            <input type="submit">
+        </form>
+    </div>
+    <div id="bookList">
+        <table>
+            <thead>
+            <tr>
+                <th>id</th>
+                <th>bname</th>
+                <th>price</th>
+                <th>删除</th>
+            </tr>
+            </thead>
+            <tbody></tbody>
+        </table>
+    </div>
+    <div id="updateBook">
+        <form>
+            <input type="text" name="bname">
+            <input type="decimal" name="price">
+            <input type="submit">
+        </form>
+    </div>
+</div>
+<script>
+
+
+    $(function () {
+        class BookManager {
+            constructor(url) {
+                this.url = url;
+            }
+
+            findAllBooks(render) {
+                this.maxId=0;
+                this.books = [
+                    {id: ++this.maxId, bname: "book1", price: 23.45},
+                    {id: ++this.maxId, bname: "book2", price: 23.45},
+                    {id: ++this.maxId, bname: "book3", price: 23.45},
+                    {id: ++this.maxId, bname: "book4", price: 23.45}
+                ]
+                setTimeout(() => {
+                    render.createTable(this.books);
+
+                }, 500);
+
+
+            }
+            addBook(book,render){
+                book.id=++this.maxId;
+                this.books.push(book);
+                setTimeout(()=>{
+                    render.addRowCallback();
+                },500);
+            }
+            deleteBook(book,render) {
+                let index = this.books.indexOf(book);
+                this.books.splice(index, 1);
+                setTimeout(()=>{
+                    render.deleteRowCallback();
+                },500);
+            }
+
+            updateBook(book,render,event) {
+               var bk={id:book.id,bname:book.bname,price:book.price};
+               book.bname=bk.bname;
+               book.price=bk.price;
+               setTimeout(()=>{
+                   render.updateTableCallback();
+               },500);
+
+
+            }
+
+
+        }
+
+        class BookRender {
+            constructor(bookManager, table) {
+                this.bookManager = bookManager;
+                this.table = table;
+                // bookManager.findAllBooks();
+                //this.books=bookManager.books;
+                bookManager.findAllBooks(this);
+            }
+            createTable(books) {
+                if (books) {
+                    this.books = books;
+                }
+                this.books.forEach((book) => {
+                    $('<tr>')
+                        .data("book", book)
+                        .append($("<td>").text(book.id))
+                        .append($("<td>").text(book.bname))
+                        .append($("<td>").text(book.price))
+                        .append($("<td>")
+                            .append($("<button>").text("删除")).on("click", (event) => {
+                                this.deleteRow(event)
+                            }))
+                        .appendTo(this.table.children("tbody"));
+                });
+                this.bindBookToUpdatePan();
+            }
+
+            deleteRow(event) {
+                var book = $(event.target).parents("tr").data("book");
+                this.bookManager.deleteBook(book,this);
+            }
+            deleteRowCallback() {
+                this.dropTable();
+                this.createTable();
+            }
+
+            dropTable() {
+                this.table.children("tbody").empty();
+            }
+
+            bindBookToUpdatePan() {
+                this.table.find("tr").dblclick(function () {
+
+                    let book = $(this).data("book");
+                    $("#updateBook [name=bname]").val(book.bname);
+                    $("#updateBook [name=price]").val(book.price);
+                    $("#updateBook").data("book", book);
+                    $("#updateBook").css({"display":"block"});
+                });
+                $("#updateBook form").off("submit");
+                $("#updateBook form").on("submit", (event) => {
+                    this.updateTable(event);
+                });
+
+            }
+
+            updateTable(event) {
+                let book = $("#updateBook").data("book");
+                book.bname = $("#updateBook [name=bname]").val();
+                book.price = $("#updateBook [name=price]").val();
+                bookManager.updateBook(book,render);
+                event.preventDefault();
+
+            }
+            updateTableCallback() {
+                 this.dropTable();
+                 this.createTable();
+                $("#updateBook").css({"display":"none"});
+
+            }
+            addRow(){
+                var book={bname: $("#bookAdd [name=bname]").val(),price:$("#bookAdd [name=price]").val()};
+                bookManager.addBook(book,this);
+
+
+            }
+            addRowCallback(){
+                this.dropTable();
+                this.createTable();
+            }
+
+
+        }
+
+        var bookManager = new BookManager("");
+
+        var render = new BookRender(bookManager, $("#bookList table"));
+        $("#bookAdd form").on("submit",(event)=>{
+           render.addRow();
+            event.preventDefault();
+        });
+
+
+    });
+</script>
+
+</body>
+</html>
