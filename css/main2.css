@@ -1,0 +1,12 @@
+#updateBook{
+    width: 400px;
+    height: 300px;
+    background-color: #eff;
+    border: 1px gray solid;
+    border-right: 4px gray solid;
+    border-bottom: 7px gray solid;
+    display: none;
+    position: absolute;
+    top: 200px;
+    left: 300px;
+}

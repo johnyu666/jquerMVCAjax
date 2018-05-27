@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+    <script src="js/jquery.js"></script>
+    <script src="js_lib1/BookComponent.js"></script>
+    <link rel="stylesheet" href="css/main2.css">
+</head>
+<body>
+    <div id="root">
+        <div id="addBook">
+            <form action="">
+                <input type="text" name="bname"><input type="decimal" name="price"><input type="submit">
+            </form>
+        </div>
+        <div id="bookList">
+            <table>
+                <thead>
+                <tr>
+                    <th>id</th>
+                    <th>bname</th>
+                    <th>price</th>
+                </tr>
+                </thead>
+                <tbody></tbody>
+            </table>
+        </div>
+        <div id="updateBook">
+            <form action="">
+                <input type="text" name="bname"><input type="decimal" name="price"><input type="submit">
+                <button>cancel</button>
+            </form>
+        </div>
+    </div>
+
+<script>
+    $(function () {
+        let maxId=0;
+        let books= [
+            {id: ++maxId, bname: "book1", price: 23.45},
+            {id: ++maxId, bname: "book2", price: 23.45},
+            {id: ++maxId, bname: "book3", price: 23.45},
+            {id: ++maxId, bname: "book4", price: 23.45}
+        ];
+        books.maxId=maxId;
+        new BookComponent($("#root"),"",books).render();
+    });
+</script>
+</body>
+</html>
